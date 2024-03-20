@@ -1,0 +1,11 @@
+﻿@inject ISuggestionData SuggestionData
+@inject NavigationManager NavMagager
+@rendermode InteractiveServer
+
+<div class="@GetVoteClass(Suggestion!)" @onclick="(() => UpvoteSuggestion(Suggestion!))">
+    <div class="text-uppercase">@GetUpvoteTopText(@Suggestion!)</div>
+    <span  class="bi bi-caret-up-fill upvote"></span>
+    <div class="text-uppercase">@GetUpvoteBottomText(@Suggestion!)</div>
+</div>
+
+

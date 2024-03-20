@@ -1,0 +1,44 @@
+﻿@attribute [StreamRendering]
+
+@GetAmountOfSuggestions()
+
+@code {
+    [Parameter]
+    public int? amountOfSuggestions { get; set; }
+
+    private string GetAmountOfSuggestions()
+    {
+        var digits = amountOfSuggestions?.ToString().Select(d => d - '0');
+
+        if (digits != null)
+        {
+            var lastDigit = digits?.Last();
+            var lastTwoDigit = int.Parse(string.Concat(digits?.TakeLast(2)!));
+
+            if ((amountOfSuggestions > 0) && (lastDigit == 1) && (lastTwoDigit != 11))
+            {
+                return $"{amountOfSuggestions} Предложение";
+            }
+
+            if ((amountOfSuggestions > 0) && (lastDigit >= 2 && lastDigit <= 4) && ((lastTwoDigit >= 12 && lastTwoDigit <= 14) == false))
+            {
+                return $"{amountOfSuggestions} Предложения";
+            }
+
+            if (amountOfSuggestions == 0)
+            {
+                return "Нет предложений";
+            }
+
+            else
+            {
+                return $"{amountOfSuggestions} Предложений";
+            }
+        }
+
+        else
+        {
+            return "Нет предложений";
+        }
+    }
+}

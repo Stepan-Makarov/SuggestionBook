@@ -1,0 +1,12 @@
+﻿@inject NavigationManager navManager
+@rendermode InteractiveServer
+<div class="close-button-section">
+    <button class="btn btn-close" @onclick="ClosePage"></button>
+</div>
+
+@code {
+    private void ClosePage()
+    {
+        navManager.NavigateTo("/");
+    }
+}

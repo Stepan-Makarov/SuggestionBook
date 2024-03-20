@@ -1,0 +1,26 @@
+﻿@page "/Account/AccessDenied"
+
+<PageTitle>Access denied</PageTitle>
+
+<header>
+    <h1 class="page-heading text-uppercase mb-4 text-danger ">Access denied</h1>
+   @*  <p class="text-danger">You do not have access to this resource.</p> *@
+</header>
+
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-8 form-layout">
+        <div class="row">
+            <div class="col-11">
+                <div class="fw-bold mb-2 fs-5">Необходима авторизация</div>
+                <p>
+                    Вы не авторизованы для доступа к этому разделу.
+                    @* Вы должны быть авторизованы, чтобы иметь возможность голосовать и оставлять свои предложения. *@
+                    Вам необходимо иметь права администратора, чтобы управлять предложениями
+                </p>
+            </div>
+            <div class="col-1">
+                <ClosePageComponent />
+            </div>
+        </div>
+    </div>
+</div>

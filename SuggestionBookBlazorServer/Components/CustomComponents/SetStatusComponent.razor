@@ -1,0 +1,55 @@
+﻿@inject ISuggestionData SuggestionData
+@rendermode InteractiveServer
+
+<AuthorizeView Roles="Admin">
+<div class="row justify-content-center detail-form">
+    <div class="col-xl-8 col-lg-10 form-layout admin-details">
+        <div>
+            <div class="fw-bold mb-2 suggestion-detail-status suggestion-detail-title">
+                Изменить Статус
+            </div>
+            @if (string.IsNullOrWhiteSpace(settingStatus))
+            {
+                <div class="admin-set-statuses">
+                    <button @onclick="@(() => settingStatus = "завершено")" 
+                        class="btn btn-flex-unset suggestion-text-category btn-status-completed">
+                        Завершено
+                    </button>
+                    <button @onclick="@(() => settingStatus = "на рассмотрении")"
+                            class="btn btn-flex-unset suggestion-text-category btn-status-watching">
+                        На рассмотрении
+                    </button>
+                    <button @onclick="@(() => settingStatus = "в производстве")"
+                            class="btn btn-flex-unset suggestion-text-category btn-status-upcoming">
+                        В производстве
+                    </button>
+                    <button @onclick="@(() => settingStatus = "отклонено")"
+                            class="btn btn-flex-unset suggestion-text-category btn-status-dismissed">
+                        Отклонено
+                    </button>
+                </div>
+            }
+            else
+            {
+                <p class="set-staus-name @SuggestionStatusClass()">
+                    @settingStatus
+                </p>
+                <div>
+                    <input @bind="settingAdminNote" class="form-control rounded-control" 
+                    type="text" placeholder="Введите свой комментарий" aria-label="Admin Note" />
+                </div>
+                <div class="suggestion-entry-bottom">
+                    <button class="btn btn-archive-confirm" @onclick="CompleteSetStatus">
+                        Подтвердить
+                    </button>
+                    <button class="btn btn-archive-cancel" @onclick="CancelSettingStatus">
+                        Отменить
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+</AuthorizeView>
+
+

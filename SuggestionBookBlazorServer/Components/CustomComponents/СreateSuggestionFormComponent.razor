@@ -1,0 +1,66 @@
+﻿@using SuggestionBookBlazorServer.Models
+@inject ISuggestionData suggestionData
+@inject NavigationManager navManager
+@rendermode InteractiveServer
+
+<EditForm Model="suggestion" OnValidSubmit="CreateSuggestion">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="input-section">
+        <label class="form-label fw-bold text-uppercase" for="suggestion-text">Предложение</label>
+        <div class="input-description">Напишите свое предложение</div>
+        <InputText class="form-control" id="suggestion-text" @bind-Value="suggestion.Title" />
+    </div>
+    <div class="input-section">
+        <label class="form-label fw-bold text-uppercase" for="category">Категория</label>
+        <div class="input-description">Выберите категорию</div>
+        <div class="col-md-8">
+            <InputRadioGroup id="category" @bind-Value="suggestion.CategoryId">
+                @foreach (var c in categories!)
+                {
+                    <div class="radio-item-group">
+                        <InputRadio id="@c.Id" Value="@c.Id" />
+                        <label for="@c.Id">@c.CategoryName - @c.CategoryDescription</label>
+                    </div>
+                }
+            </InputRadioGroup>
+        </div>
+    </div>
+    <div class="input-section">
+        <label class="form-label fw-bold text-uppercase" for="description">Предложение</label>
+        <div class="input-description">Кратко опишите свое предложение</div>
+        <InputText class="form-control" id="description" @bind-Value="suggestion.Description" />
+    </div>
+    <div class="center-children">
+        <button class="bnt main-btn btn-lg text-uppercase" type="submit">Отправить</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public List<CategoryModel>? categories { get; set; }
+
+    [Parameter]
+    public UserModel? loggedInUser { get; set; }
+
+    private CreateSuggestionModel suggestion = new();
+
+    private async Task CreateSuggestion()
+    {
+        SuggestionModel s = new();
+        s.Title = suggestion.Title;
+        s.Description = suggestion.Description;
+        s.Category = categories?.Where(c => c.Id == suggestion.CategoryId).FirstOrDefault();
+        s.Author = new UserSubModel(loggedInUser);
+
+        if (s.Category is null)
+        {
+            suggestion.CategoryId = "";
+            return;
+        }
+
+        await suggestionData.CreateSuggestion(s);
+        suggestion = new();
+        navManager.NavigateTo("/");
+    }
+}

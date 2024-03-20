@@ -1,0 +1,57 @@
+﻿@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        @* <a href="create" class="navigation-item">
+            <span class="bi bi-card-heading" aria-hidden="true"></span> Создать Предложение
+        </a> *@
+        <a href="profile" class="navigation-item">
+            <span class="bi bi-person" aria-hidden="true"></span> Профиль
+        </a>
+        <form class="navigation-item" action="Account/Logout" method="post">
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+            <button type="submit" class="navigation-item">
+                <span class="bi bi-arrow-bar-left" aria-hidden="true"></span> Выйти
+            </button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a href="Account/Register" class="navigation-item">
+            <span class="bi bi-person-fill" aria-hidden="true"></span> Зарегистрироваться
+        </a>
+        <a href="Account/Login" class="navigation-item">
+            <span class="bi bi-person-badge" aria-hidden="true"></span> Войти
+        </a>
+    </NotAuthorized>
+</AuthorizeView>
+<AuthorizeView Roles="Admin">
+    <a href="adminApproval" class="navigation-item">
+        <span class="bi bi-caret-up-fill" aria-hidden="true"></span> Админ
+    </a>
+</AuthorizeView>
+<a href="" class="navigation-item">
+    <span class="bi bi-house-door-fill" aria-hidden="true"></span> Главная
+</a>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

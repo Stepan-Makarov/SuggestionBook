@@ -1,0 +1,33 @@
+﻿@page "/Create"
+@using SuggestionBookBlazorServer.Models
+@inject ICategoryData categoryData
+@inject IUserData userData
+@inject IdentityUserAccessor UserAccessor
+@attribute [StreamRendering]
+@attribute [Authorize]
+
+<h1 class="page-heading text-uppercase mb-4">Создать Предложение</h1>
+<div class="row justify-content-center create-form">
+    <div class="col-xl-8 col-lg-10 form-layout">
+        <ClosePageComponent></ClosePageComponent>
+        @if (categories is not null)
+        {
+            <СreateSuggestionFormComponent categories="@categories" loggedInUser="@loggedInUser" />
+        }
+    </div>
+</div>
+
+@code {
+    private List<CategoryModel>? categories;
+    private UserModel? loggedInUser;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await categoryData.GetAllCategories();
+        var u = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        loggedInUser = await userData.GetUserByAuthId(u.Id);
+    }
+}

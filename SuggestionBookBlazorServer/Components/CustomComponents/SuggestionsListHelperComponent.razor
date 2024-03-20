@@ -1,0 +1,46 @@
+﻿@attribute [StreamRendering]
+
+@if (suggestions?.Count > 0)
+{
+    <div class="form-layout mb-3">
+        <h2 class="my-submission-heading">@Title</h2>
+        <p class="my-submission-text">@Intro</p>
+        @foreach (var s in suggestions)
+        {
+            <hr class="my-submission-separator" />
+            <div class="fw-bold suggestion-detail-title">
+                @s.Title
+            </div>
+            <p class="my-submission-text">
+                @s.DateCreated.ToString("dd.MM.yyyy")
+            </p>
+            <p class="my-submission-text">
+                Общее число голосов: @s.UserVotes.Count
+            </p>
+            <p class="my-submission-text">
+                @s.Category.CategoryName
+            </p>
+            <p class="my-submission-text">
+                @s.Description
+            </p>
+            if (s.Status is not null)
+            {
+                <div class="fw-bold suggestion-detail-title">
+                    @s.Status.StatusName
+                </div>
+                <p class="my-submission-text">
+                    @((MarkupString)s.OwnerNotes)
+                </p>
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<SuggestionModel>? suggestions { get; set; }
+    [Parameter]
+    public string? Title { get; set; }
+    [Parameter]
+    public string? Intro { get; set; }
+}

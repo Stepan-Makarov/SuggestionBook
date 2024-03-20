@@ -1,0 +1,65 @@
+﻿@page "/Details/{Id}"
+@inject ISuggestionData SuggestionData
+@inject IUserData UserData
+@inject IStatusData StatusData
+@inject IdentityUserAccessor UserAccessor
+@rendermode InteractiveServer
+
+<h1 class="page-heading text-uppercase mb-4">Информация О Предложении</h1>
+
+<div class="row justify-content-center detail-form">
+    <div class ="col-xl-8 col-lg-10 form-layout">
+        @if (suggestion is not null)
+        {
+            <div class="row suggestion-detail-row">
+                <div class="col-11 suggestion-detail">
+                    <div>
+                        <ApvoteComponent LoggedInUserId="@loggedInUser?.Id" Suggestion="suggestion" />
+                        <div>
+                            <div class="suggestion-detail-date">@suggestion.DateCreated.ToString("dd.MM.yyyy")</div>
+                        </div>
+                    </div>
+                    <div class="suggestion-detail-text">
+                        <div class="fw-bold mb-2 suggestion-detail-title">@suggestion.Title</div>
+                        <div class="mb-2 suggestion-detail-author">@suggestion.Author.DisplayName</div>
+                        <div class="mb-2 d-none d-md-block">@suggestion.Description</div>
+                        <div class="suggestion-text-category d-none d-md-block">@suggestion.Category.CategoryName</div>
+                    </div>
+                </div>
+                <div class="col-1">
+                    <ClosePageComponent />
+                </div>
+                <div class="row d-block d-md-none">
+                    <div class="suggestion-detail-text">
+                        <div>@suggestion.Description</div>
+                        <div class="suggestion-text-category">@suggestion.Category.CategoryName</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (suggestion?.Status is not null)
+{
+    <div class="row justify-content-center detail-form">
+        <div class="col-xl-8 col-lg-10 suggestion-results form-layout">
+            <div class="@SuggestionStatusClass()" id="suggestion-detail-status"></div>
+            <div class="suggestion-detail-status-section">
+                <div class="fw-bold mb-2 suggestion-detail-status suggestion-detail-title">
+                    @suggestion.Status.StatusName
+                </div>
+                <div class="suggestion-detail-owner-notes">
+                    @((MarkupString)suggestion.OwnerNotes)
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (suggestion is not null)
+{
+    <SetStatusComponent Statuses="statuses" Suggestion="suggestion" OnStatusChanged="HandleStatusChanged" />
+}
+
+

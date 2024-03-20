@@ -1,0 +1,71 @@
+﻿@page "/Profile"
+@inject ISuggestionData suggestionData
+@inject IUserData userData
+@inject IdentityUserAccessor UserAccessor
+@attribute [StreamRendering]
+@attribute [Authorize]
+
+<h1 class="page-heading text-uppercase mb-4">Профиль</h1>
+<div class="row">
+    <div class="col-12">
+        <ClosePageComponent></ClosePageComponent>
+    </div>
+</div>
+<div class="form-layout mb-3">
+    <h2 class="my-submission-heading">Мой Аккаунт</h2>
+    <p class="my-submission-text">
+        <a href="Account/Manage">Редактировать Профиль</a>
+    </p>
+</div>
+<SuggestionsListHelperComponent
+    suggestions="@approved"
+    Title="Подтвержденные Предложения"
+    Intro="Мои текущие активные предложения">
+</SuggestionsListHelperComponent>
+<SuggestionsListHelperComponent
+    suggestions="@archived"
+    Title="Архивированные Предложения"
+    Intro="Предложения которые были решены или устарели">
+</SuggestionsListHelperComponent>
+<SuggestionsListHelperComponent
+    suggestions="@pending"
+    Title="Предложеня В Ожидании"
+    Intro="Предложения не проверенные администратором">
+</SuggestionsListHelperComponent>
+<SuggestionsListHelperComponent
+    suggestions="@rejected"
+    Title="Отклоненные Предложения"
+    Intro="Предложения которые были отклонены администратором">
+</SuggestionsListHelperComponent>
+
+@code {
+    private List<SuggestionModel>? submissions;
+    private List<SuggestionModel>? approved;
+    private List<SuggestionModel>? archived;
+    private List<SuggestionModel>? pending;
+    private List<SuggestionModel>? rejected;
+    private UserModel? loggedInUser;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var u = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        loggedInUser = await userData.GetUserByAuthId(u.Id);
+
+        if (loggedInUser is not null)
+        {
+            var results = await suggestionData.GetAllUsersSuggestions(loggedInUser.Id);
+
+            if (results is not null)
+            {
+                submissions = results.OrderByDescending(s => s.DateCreated).ToList();
+                approved = submissions.Where(s => s.ApprovedForRelease == true && s.Archived == false && s.Rejected == false).ToList();
+                archived = submissions.Where(s => s.Archived && s.Rejected == false).ToList();
+                pending = submissions.Where(s => s.ApprovedForRelease == false && s.Rejected == false).ToList();
+                rejected = submissions.Where(s => s.Rejected == true).ToList();
+            }
+        }
+    }
+}

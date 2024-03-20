@@ -1,0 +1,37 @@
+﻿@page "/"
+@inject ICategoryData CategoryData
+@inject IStatusData StatusData
+@inject IUserData UserData
+@inject IdentityUserAccessor UserAccessor
+@attribute [StreamRendering]
+
+<PageTitle>Home</PageTitle>
+
+<h1 class="page-heading text-uppercase mb-3">Предложения</h1>
+
+<AllInformationAboutHomePage Statuses="@statuses" Categories="@categories" LoggedInUserId="@loggedInUser?.Id" />
+
+@code {
+    private List<CategoryModel>? categories;
+    private List<StatusModel>? statuses;
+    private UserModel? loggedInUser;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected async override Task OnInitializedAsync()
+    {
+        categories = await CategoryData.GetAllCategories();
+        statuses = await StatusData.GetAllStatuses();
+        if (HttpContext != null && HttpContext.User?.Identity?.IsAuthenticated == true)
+        {
+            await GetAndVerifyUser();
+        }
+    }
+
+    private async Task<UserModel> GetAndVerifyUser()
+    {
+        var u = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        return loggedInUser = await UserData.GetUserByAuthId(u.Id);
+    }
+}

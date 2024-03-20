@@ -1,0 +1,36 @@
+﻿@page "/auth"
+
+@using SuggestionBookBlazorServer.Components.Account
+@inject IdentityUserAccessor UserAccessor
+@inject IUserData userData
+
+@attribute [Authorize]
+
+<PageTitle>Auth</PageTitle>
+
+<h1>You are authenticated</h1>
+
+<div>
+    <AuthorizeView>
+        @* Hello @context.User.Identity?.Name! *@
+        Hello @user.DisplayName
+    </AuthorizeView>
+</div>
+<div>
+    <AuthorizeView Roles="Admin">
+        You are an Admin
+    </AuthorizeView>
+</div>
+
+@code {
+    private UserModel user = new();
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var u = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        user = await userData.GetUserByAuthId(u.Id);
+    }
+}

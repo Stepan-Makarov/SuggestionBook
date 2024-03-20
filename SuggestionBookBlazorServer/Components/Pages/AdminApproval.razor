@@ -1,0 +1,74 @@
+﻿@page "/AdminApproval"
+@inject ISuggestionData suggestionData
+@inject IUserData userData
+@inject IStatusData statusData
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@attribute [Authorize(Roles = "Admin")]
+
+<h1 class="page-heading text-uppercase mb-4">Предложения в ожидании</h1>
+<div class="row">
+    <div class="suggestions-count col-8 mt-2">
+        <GetAmountOfSuggestionsComponent amountOfSuggestions="submissions?.Count" />
+    </div>
+    <div class="col-4">
+        <ClosePageComponent />
+    </div>
+</div>
+
+@if (submissions is not null)
+{
+    @foreach (var s in submissions)
+    {
+        <div class="row submission">
+            <div class="col-xxl-2 col-md-3 col-sm-4">
+                <button class="btn approve-btn" @onclick="(() => ApproveSuggestion(s))">Подтвердить</button>
+                <button class="btn reject-btn" @onclick="(() => RejectSuggestion(s))">Отклонить</button>
+            </div>
+            <div class="col-xxl-10 col-md-9 col-sm-8">
+                <div>
+                    @if (currentEditingTitle == s.Id)
+                    {
+                        <EditForm class="approval-edit-form" Model="@editedTitle" OnSubmit="(() => SaveTitle(s))">
+                            <InputText class="form-control approval-edit-field" @bind-Value="editedTitle" />
+                            <button class="btn" type="submit">
+                                <span class="bi bi-check-lg submission-edit-approve"></span>
+                            </button>
+                            <button type="button" class="btn" @onclick="(() => currentEditingTitle = string.Empty)">
+                                <span class="bi bi-x-lg submission-edit-reject"></span>
+                            </button>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        @s.Title
+                        <span class="bi bi-pencil submission-edit-icon" @onclick="(() => EditTitle(s))"></span>
+                    }
+                </div>
+                <div>@s.Category.CategoryName</div>
+                <div>@s.Author.DisplayName</div>
+                <div>
+                    @if (currentEditingDescription == s.Id)
+                    {
+                        <EditForm class="approval-edit-form" Model="@editedDescription" OnSubmit="(() => SaveDescription(s))">
+                            <InputText class="form-control approval-edit-field" @bind-Value="editedDescription" />
+                            <button class="btn" type="submit">
+                                <span class="bi bi-check-lg submission-edit-approve"></span>
+                            </button>
+                            <button class="btn" @onclick="(() => currentEditingDescription = string.Empty)">
+                                <span class="bi bi-x-lg submission-edit-reject"></span>
+                            </button>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        @s.Description
+                        <span class="bi bi-pencil submission-edit-icon" @onclick="(() => EditDescription(s))"></span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
